@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "redsys-easy": "^2.0.0"
+    "redsys-easy": "2.0.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
