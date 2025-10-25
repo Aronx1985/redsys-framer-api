@@ -1,24 +1,22 @@
-// Forzamos CJS en un módulo ESM
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const redsysEasy = require('redsys-easy');
-const { createRedsys } = redsysEasy;
+// CommonJS puro
+const { createRedsys } = require('redsys-easy');
 
 const TEST_SECRET = 'sq7HjrUOBfKmC576ILgskD5srU870gJ7'; // clave PRUEBAS
 
-// Crea cliente Redsys
 const redsys = createRedsys({
   secretKey: process.env.REDSYS_KEY || TEST_SECRET,
 });
 
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
   try {
-    const { amount = '100', order = '12345678' } = (req.query || {});
+    const q = req.query || {};
+    const amount = String(q.amount || '100');       // céntimos
+    const order  = String(q.order  || '12345678');  // 4–12 chars, 4 primeros numéricos
 
     const params = {
-      DS_MERCHANT_AMOUNT: amount,                              // céntimos
-      DS_MERCHANT_ORDER: order,                                // 4–12 chars, 4 primeros numéricos
-      DS_MERCHANT_MERCHANTCODE: process.env.REDSYS_FUC || '999008881', // FUC PRUEBAS
+      DS_MERCHANT_AMOUNT: amount,
+      DS_MERCHANT_ORDER: order,
+      DS_MERCHANT_MERCHANTCODE: process.env.REDSYS_FUC || '999008881',
       DS_MERCHANT_CURRENCY: '978',
       DS_MERCHANT_TRANSACTIONTYPE: '0',
       DS_MERCHANT_TERMINAL: '1',
@@ -34,9 +32,9 @@ export default async function handler(req, res) {
       Ds_SignatureVersion: 'HMAC_SHA256_V1',
       Ds_MerchantParameters,
       Ds_Signature,
-      redsysUrl: 'https://sis-t.redsys.es:25443/sis/realizarPago' // TPV PRUEBAS
+      redsysUrl: 'https://sis-t.redsys.es:25443/sis/realizarPago'
     });
   } catch (e) {
     res.status(500).json({ ok:false, error: String(e) });
   }
-}
+};
